@@ -77,6 +77,12 @@
 	        <scope>runtime</scope>
 	    </dependency>
 
+        <!-- Reactive Redis for Blacklist Check -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
+        </dependency>
+
     </dependencies>
 
 
