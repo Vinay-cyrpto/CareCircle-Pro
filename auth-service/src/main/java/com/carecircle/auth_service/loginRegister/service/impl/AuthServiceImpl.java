@@ -6,8 +6,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.carecircle.auth_service.emailService.service.EmailOtpService;
+import com.carecircle.auth_service.loginRegister.dto.request.ForgotPasswordRequest;
 import com.carecircle.auth_service.loginRegister.dto.request.LoginRequest;
 import com.carecircle.auth_service.loginRegister.dto.request.RegisterRequest;
+import com.carecircle.auth_service.loginRegister.dto.request.ResetPasswordRequest;
+import com.carecircle.auth_service.loginRegister.dto.request.TokenRefreshRequest;
+import com.carecircle.auth_service.loginRegister.dto.request.VerifyEmailRequest;
+import com.carecircle.auth_service.loginRegister.dto.response.JwtResponse;
+import com.carecircle.auth_service.loginRegister.dto.response.TokenRefreshResponse;
 import com.carecircle.auth_service.loginRegister.exception.AccountNotVerifiedException;
 import com.carecircle.auth_service.loginRegister.exception.InvalidCredentialsException;
 import com.carecircle.auth_service.loginRegister.exception.UserAlreadyExistsException;
@@ -16,7 +22,8 @@ import com.carecircle.auth_service.loginRegister.model.User;
 import com.carecircle.auth_service.loginRegister.repository.UserRepository;
 import com.carecircle.auth_service.loginRegister.security.JwtUtil;
 import com.carecircle.auth_service.loginRegister.service.AuthService;
-import com.carecircle.auth_service.loginRegister.dto.request.*;
+import io.jsonwebtoken.Claims;
+import java.util.UUID;
 
 
 @Service
@@ -28,15 +35,18 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final EmailOtpService emailOtpService;
+    private final RedisSessionService redisSessionService;
 
     public AuthServiceImpl(UserRepository userRepository,
                            PasswordEncoder passwordEncoder,
                            JwtUtil jwtUtil,
-                           EmailOtpService emailOtpService) {
+                           EmailOtpService emailOtpService,
+                           RedisSessionService redisSessionService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.emailOtpService = emailOtpService;
+        this.redisSessionService = redisSessionService;
     }
 
     @Override
@@ -90,7 +100,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String login(LoginRequest request) {
+    public JwtResponse login(LoginRequest request) {
         logger.info("Login attempt for email: {} with role: {}", request.getEmail(), request.getRole());
         
         User user = userRepository.findByEmailAndRole(request.getEmail(), request.getRole())
@@ -113,9 +123,58 @@ public class AuthServiceImpl implements AuthService {
         }
 
         String token = jwtUtil.generateToken(user);
+        String refreshToken = redisSessionService.createRefreshToken(user.getId().toString());
         logger.info("Login successful for email: {} with role: {}", request.getEmail(), request.getRole());
         
-        return token;
+        return new JwtResponse(
+            token, 
+            refreshToken, 
+            user.getId(), 
+            user.getEmail(), 
+            user.getRole().name()
+        );
+    }
+
+    @Override
+    public TokenRefreshResponse refreshToken(TokenRefreshRequest request) {
+        String userId = redisSessionService.getUserIdFromRefreshToken(request.getRefreshToken());
+        
+        if (userId == null) {
+            throw new RuntimeException("Refresh token is expired or invalid!");
+        }
+
+        logger.info("the refresh token has hit");
+        User user = userRepository.findById(UUID.fromString(userId))
+                .orElseThrow(() -> new RuntimeException("User not found!"));
+
+        String token = jwtUtil.generateToken(user);
+        return new TokenRefreshResponse(token, request.getRefreshToken());
+    }
+
+    @Override
+    public void logout(String token) {
+        // 1. Get UserId and Session from Refresh Token (if possible)
+        // In a real app, we might store the access-refresh link.
+        // For now, we blacklist the Access Token and delete the associated Refresh Token if provided.
+        
+        // Note: Real blacklisting requires the Access Token's expiry.
+        // We'll extract it from the token itself.
+        try {
+            Claims claims = jwtUtil.extractAllClaims(token);
+            long expiration = claims.getExpiration().getTime();
+            long now = System.currentTimeMillis();
+            long ttl = expiration - now;
+            
+            if (ttl > 0) {
+                redisSessionService.blacklistAccessToken(token, ttl);
+            }
+            
+            // Also delete the refresh token if we can identify it. 
+            // In a better design, we'd pass both or look up the session by userId.
+            logger.info("Token blacklisted for logout. Remaining TTL: {}ms", ttl);
+        } catch (Exception e) {
+            logger.warn("Could not blacklist token on logout: {}", e.getMessage());
+        }
     }
 
     @Override
@@ -163,4 +222,5 @@ public class AuthServiceImpl implements AuthService {
         logger.info("Password reset successfully for email: {} with role: {}", 
                 request.getEmail(), request.getRole());
     }
+
 }
