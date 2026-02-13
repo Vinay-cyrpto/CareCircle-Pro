@@ -1,97 +1,46 @@
-import API_BASE_URL from "./api";
-
-const getHeaders = () => {
-    const token = localStorage.getItem("token"); // Assuming token is stored as 'token'
-    return {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-    };
-};
+import api from "./api";
 
 export const createParentProfile = async (data) => {
-    const res = await fetch(`${API_BASE_URL}/parents/profile`, {
-        method: "POST",
-        headers: getHeaders(),
-        body: JSON.stringify(data),
-    });
-    if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText || `Failed to create parent profile (${res.status})`);
-    }
-    return res.json();
+    const res = await api.post("/parents/profile", data);
+    return res.data;
 };
 
 export const getParentProfile = async () => {
-    const res = await fetch(`${API_BASE_URL}/parents/profile/me`, {
-        method: "GET",
-        headers: getHeaders(),
-    });
-    if (!res.ok) throw new Error("Failed to fetch parent profile");
-    return res.json();
+    const res = await api.get("/parents/profile/me");
+    return res.data;
 };
 
 export const updateParentProfile = async (data) => {
-    const res = await fetch(`${API_BASE_URL}/parents/profile`, {
-        method: "PUT",
-        headers: getHeaders(),
-        body: JSON.stringify(data),
-    });
-    if (!res.ok) throw new Error("Failed to update parent profile");
-    return res.json();
+    const res = await api.put("/parents/profile", data);
+    return res.data;
 };
 
 export const addChild = async (data) => {
-    const res = await fetch(`${API_BASE_URL}/parents/children`, {
-        method: "POST",
-        headers: getHeaders(),
-        body: JSON.stringify(data),
-    });
-    if (!res.ok) throw new Error("Failed to add child");
-    return res.json();
+    const res = await api.post("/parents/children", data);
+    return res.data;
 };
 
 export const getChildren = async () => {
-    const res = await fetch(`${API_BASE_URL}/parents/children`, {
-        method: "GET",
-        headers: getHeaders(),
-    });
-    if (!res.ok) throw new Error("Failed to fetch children");
-    return res.json();
+    const res = await api.get("/parents/children");
+    return res.data;
 };
 
 export const updateChild = async (id, data) => {
-    const res = await fetch(`${API_BASE_URL}/parents/children/${id}`, {
-        method: "PUT",
-        headers: getHeaders(),
-        body: JSON.stringify(data),
-    });
-    if (!res.ok) throw new Error("Failed to update child");
-    return res.json();
+    const res = await api.put(`/parents/children/${id}`, data);
+    return res.data;
 };
 
 export const deleteChild = async (id) => {
-    const res = await fetch(`${API_BASE_URL}/parents/children/${id}`, {
-        method: "DELETE",
-        headers: getHeaders(),
-    });
-    if (!res.ok) throw new Error("Failed to delete child");
-    return true; // 204 No Content
+    await api.delete(`/parents/children/${id}`);
+    return true;
 };
 
 export const getVerifiedCaregivers = async () => {
-    const res = await fetch(`${API_BASE_URL}/parents/caregivers`, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }, // Only Auth header required for this GET
-    });
-    if (!res.ok) throw new Error("Failed to fetch caregivers");
-    return res.json();
+    const res = await api.get("/parents/caregivers");
+    return res.data;
 };
 
 export const getCaregiverDetails = async (id) => {
-    const res = await fetch(`${API_BASE_URL}/parents/caregivers/${id}`, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    });
-    if (!res.ok) throw new Error("Failed to fetch caregiver details");
-    return res.json();
+    const res = await api.get(`/parents/caregivers/${id}`);
+    return res.data;
 };

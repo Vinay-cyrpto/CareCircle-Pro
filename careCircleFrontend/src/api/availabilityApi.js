@@ -1,34 +1,18 @@
-const getHeaders = () => {
-    const token = localStorage.getItem("token");
-    return {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-    };
+import api from "./api";
+
+export const getMyAvailability = async (caregiverId) => {
+    const res = await api.get(`/caregiver/availability?caregiverId=${caregiverId}`);
+    return res.data;
 };
 
-export const getMyAvailability = async () => {
-    const response = await fetch("/caregiver/availability", {
-        headers: getHeaders()
-    });
-    if (!response.ok) throw new Error("Failed to fetch availability");
-    return response.json();
-};
+export const getAvailability = getMyAvailability;
 
 export const addAvailability = async (data) => {
-    const response = await fetch("/caregiver/availability", {
-        method: "POST",
-        headers: getHeaders(),
-        body: JSON.stringify(data)
-    });
-    if (!response.ok) throw new Error("Failed to add availability");
-    return response.json();
+    const res = await api.post("/caregiver/availability", data);
+    return res.data;
 };
 
 export const deleteAvailability = async (id) => {
-    const response = await fetch(`/caregiver/availability/${id}`, {
-        method: "DELETE",
-        headers: getHeaders()
-    });
-    if (!response.ok) throw new Error("Failed to delete availability");
+    await api.delete(`/caregiver/availability/${id}`);
     return true;
 };
