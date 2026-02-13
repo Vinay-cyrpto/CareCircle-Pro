@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public class MatchingIntegrationService {
 
     private final RestClient restClient;
-    private static final String MATCHING_SERVICE_URL = "http://localhost:8085";
+    private static final String MATCHING_SERVICE_URL = "http://matching-booking-service:8085";
 
     public MatchingIntegrationService(RestClient.Builder restClientBuilder) {
         this.restClient = restClientBuilder.baseUrl(MATCHING_SERVICE_URL).build();

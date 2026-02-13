@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class UserIntegrationService {
 
     private final RestClient restClient;
-    private static final String USER_PROFILE_SERVICE_URL = "http://localhost:8083";
+    private static final String USER_PROFILE_SERVICE_URL = "http://user-profile-service:8083";
 
     public UserIntegrationService(RestClient.Builder restClientBuilder) {
         this.restClient = restClientBuilder.baseUrl(USER_PROFILE_SERVICE_URL).build();

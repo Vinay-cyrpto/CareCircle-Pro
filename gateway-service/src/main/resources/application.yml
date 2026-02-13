@@ -113,7 +113,7 @@ spring:
             - StripPrefix=1
 
         - id: communication-ws
-          uri: http://localhost:8082
+          uri: http://communication-service:8082
           predicates:
             - Path=/ws/**
           filters:
@@ -122,11 +122,11 @@ spring:
 
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
 jwt:
-  secret: carecircle-auth-secret-key-which-is-at-least-32-bytes-long
+  secret: ${JWT_SECRET:carecircle-auth-secret-key-which-is-at-least-32-bytes-long}
 
 management:
   endpoints:
