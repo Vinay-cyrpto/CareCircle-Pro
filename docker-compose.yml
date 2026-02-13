@@ -1,0 +1,104 @@
+services:
+  # Redis for Session Management & Token Blacklisting
+  redis:
+    image: redis:alpine
+    container_name: carecircle-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - carecircle-network
+    restart: always
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    ports:
+      - "8081:8081"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/carecircle_auth_service?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=shiva
+      - SPRING_DATASOURCE_PASSWORD=Shiva@123
+      - SPRING_DATA_REDIS_HOST=redis
+    depends_on:
+      - redis
+    networks:
+      - carecircle-network
+
+  user-profile-service:
+    build: ./user-profile-service
+    container_name: user-profile-service
+    ports:
+      - "8083:8083"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/carecircle_user_profile?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=shiva
+      - SPRING_DATASOURCE_PASSWORD=Shiva@123
+      - SPRING_DATA_REDIS_HOST=redis
+    depends_on:
+      - redis
+    networks:
+      - carecircle-network
+
+  communication-service:
+    build: ./communication-service
+    container_name: communication-service
+    ports:
+      - "8082:8082"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/carecircle_communication_service?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=shiva
+      - SPRING_DATASOURCE_PASSWORD=Shiva@123
+      - SPRING_DATA_REDIS_HOST=redis
+    depends_on:
+      - redis
+    networks:
+      - carecircle-network
+
+  matching-booking-service:
+    build: ./matching-booking-service
+    container_name: matching-booking-service
+    ports:
+      - "8085:8085"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/carecircle_matching_booking?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=shiva
+      - SPRING_DATASOURCE_PASSWORD=Shiva@123
+      - SPRING_DATA_REDIS_HOST=redis
+    depends_on:
+      - redis
+    networks:
+      - carecircle-network
+
+  gateway-service:
+    build: ./gateway-service
+    container_name: gateway-service
+    ports:
+      - "8080:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - SPRING_DATA_REDIS_HOST=redis
+    depends_on:
+      - redis
+    networks:
+      - carecircle-network
+
+  frontend:
+    build: ./careCircleFrontend
+    container_name: carecircle-frontend
+    ports:
+      - "5173:80"
+    networks:
+      - carecircle-network
+
+networks:
+  carecircle-network:
+    driver: bridge
