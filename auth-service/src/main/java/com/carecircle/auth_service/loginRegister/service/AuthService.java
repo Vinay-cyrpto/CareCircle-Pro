@@ -22,7 +22,7 @@ public interface AuthService {
 
     TokenRefreshResponse refreshToken(TokenRefreshRequest request);
 
-    void logout(String token);
+    void logout(String token, String userId);
 }
 
 

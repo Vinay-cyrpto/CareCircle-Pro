@@ -58,9 +58,10 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String userId = request.getHeader("X-User-Id");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            authService.logout(token);
+            authService.logout(token, userId);
             return ResponseEntity.ok("Logged out successfully");
         }
         return ResponseEntity.badRequest().body("Token required for logout");

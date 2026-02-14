@@ -151,8 +151,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void logout(String token) {
-        // 1. Get UserId and Session from Refresh Token (if possible)
+    public void logout(String token, String userId) {
+        // 1. Blacklist the Access Token
         // In a real app, we might store the access-refresh link.
         // For now, we blacklist the Access Token and delete the associated Refresh Token if provided.
         
@@ -168,11 +168,14 @@ public class AuthServiceImpl implements AuthService {
                 redisSessionService.blacklistAccessToken(token, ttl);
             }
             
-            // Also delete the refresh token if we can identify it. 
-            // In a better design, we'd pass both or look up the session by userId.
-            logger.info("Token blacklisted for logout. Remaining TTL: {}ms", ttl);
+            // 2. Revoke all Refresh Tokens for this user (Logout from all devices)
+            if (userId != null && !userId.isBlank()) {
+                redisSessionService.deleteUserSessions(userId);
+            }
+            
+            logger.info("Token blacklisted and user sessions revoked for userId: {}. Remaining TTL: {}ms", userId, ttl);
         } catch (Exception e) {
-            logger.warn("Could not blacklist token on logout: {}", e.getMessage());
+            logger.warn("Could not handle logout correctly: {}", e.getMessage());
         }
     }
 
