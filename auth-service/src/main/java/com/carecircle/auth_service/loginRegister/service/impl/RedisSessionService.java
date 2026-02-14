@@ -62,4 +62,20 @@ public class RedisSessionService {
     public boolean isTokenBlacklisted(String accessToken) {
         return Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:" + accessToken));
     }
+
+    /**
+     * Delete all refresh tokens for a specific user (Revoke all sessions)
+     * Note: This is a bit expensive in large Redis DBs but works fine for this scale.
+     */
+    public void deleteUserSessions(String userId) {
+        var keys = redisTemplate.keys("refreshToken:*");
+        if (keys != null) {
+            for (String key : keys) {
+                String value = redisTemplate.opsForValue().get(key);
+                if (userId.equals(value)) {
+                    redisTemplate.delete(key);
+                }
+            }
+        }
+    }
 }

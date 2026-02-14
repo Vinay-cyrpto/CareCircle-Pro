@@ -142,8 +142,7 @@ public class AuthServiceImpl implements AuthService {
         if (userId == null) {
             throw new RuntimeException("Refresh token is expired or invalid!");
         }
-
-        logger.info("the refresh token has hit");
+        
         User user = userRepository.findById(UUID.fromString(userId))
                 .orElseThrow(() -> new RuntimeException("User not found!"));
 
@@ -218,8 +217,11 @@ public class AuthServiceImpl implements AuthService {
         
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
+
+        // EXTRA SECURITY: Revoke all existing sessions (Force logout everywhere)
+        redisSessionService.deleteUserSessions(user.getId().toString());
         
-        logger.info("Password reset successfully for email: {} with role: {}", 
+        logger.info("Password reset and sessions revoked successfully for email: {} with role: {}", 
                 request.getEmail(), request.getRole());
     }
 
