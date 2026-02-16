@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareCircle-Pro: Master Visual Guide</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            securityLevel: 'loose',
+            flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+        });
+    </script>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --sidebar-color: #161b22;
+            --accent-color: #58a6ff;
+            --secondary-accent: #7ee787;
+            --text-color: #c9d1d9;
+            --card-bg: #21262d;
+            --border-color: #30363d;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #sidebar {
+            width: 280px;
+            background-color: var(--sidebar-color);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        #sidebar h2 {
+            padding: 0 20px;
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
+
+        #sidebar .nav-group {
+            margin-bottom: 20px;
+        }
+
+        #sidebar .nav-group-title {
+            padding: 0 20px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #8b949e;
+            margin-bottom: 8px;
+            letter-spacing: 0.1em;
+        }
+
+        #sidebar a {
+            padding: 10px 20px;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            display: block;
+        }
+
+        #sidebar a:hover,
+        #sidebar a.active {
+            background-color: #21262d;
+            color: var(--accent-color);
+            border-left: 4px solid var(--accent-color);
+            padding-left: 16px;
+        }
+
+        #content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .section {
+            display: none;
+            max-width: 1100px;
+            margin: 0 auto;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-top: 0;
+            color: #f0f6fc;
+        }
+
+        h3 {
+            color: var(--accent-color);
+            margin-top: 30px;
+        }
+
+        .mermaid {
+            background: #ffffff05;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        .note {
+            background-color: rgba(88, 166, 255, 0.1);
+            border-left: 4px solid var(--accent-color);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .success-note {
+            background-color: rgba(126, 231, 135, 0.1);
+            border-left: 4px solid var(--secondary-accent);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .warning-note {
+            background-color: rgba(255, 165, 0, 0.1);
+            border-left: 4px solid #ffa500;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        th {
+            color: var(--accent-color);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            background: #ffffff05;
+        }
+
+        code {
+            background: #30363d;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: var(--secondary-accent);
+        }
+
+        .badge {
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .badge-parent {
+            background: #ddf4ff;
+            color: #0969da;
+        }
+
+        .badge-caregiver {
+            background: #dafbe1;
+            color: #1a7f37;
+        }
+
+        .badge-admin {
+            background: #fff1f8;
+            color: #bf3989;
+        }
+
+        .badge-all {
+            background: #fff8c5;
+            color: #9a6700;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="sidebar">
+        <h2>🩺 CareCircle Guide</h2>
+
+        <div class="nav-group">
+            <div class="nav-group-title">Core Infrastructure</div>
+            <a href="#" id="link-arch" onclick="showSection('arch')">🏗️ System Architecture</a>
+            <a href="#" id="link-redis" onclick="showSection('redis')">🚀 Redis Session Flow</a>
+            <a href="#" id="link-request" onclick="showSection('request')">🌉 Request Lifecycle</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-title">Elite Feature Flows</div>
+            <a href="#" id="link-profile" onclick="showSection('profile')">👤 Profile Creation</a>
+            <a href="#" id="link-booking" onclick="showSection('booking')">📅 Matching & Booking</a>
+            <a href="#" id="link-chat" onclick="showSection('chat')">💬 Chat & Booking Bridge</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-title">Master API Explorer</div>
+            <a href="#" id="link-api-map" onclick="showSection('api-map')">🗺️ Full Controller Map</a>
+            <a href="#" id="link-solid" onclick="showSection('solid')">💎 SOLID Principles</a>
+        </div>
+    </div>
+
+    <div id="content">
+        <!-- Architecture Section -->
+        <div id="arch" class="section active">
+            <h1>🏗️ System Architecture</h1>
+            <div class="card">
+                <div class="mermaid">
+                    graph TD
+                    subgraph "Frontend Layer"
+                    ReactApp["📱 React UI (5173)"]
+                    end
+
+                    subgraph "Gateway Layer"
+                    Gateway["🛡️ API Gateway (8080)"]
+                    Redis["🚀 Redis (Blacklist & Sessions)"]
+                    end
+
+                    subgraph "Microservices Layer"
+                    Auth["🔑 Auth Service (8081)"]
+                    Profile["👤 Profile Service (8083)"]
+                    Booking["📅 Booking Service (8085)"]
+                    Chat["💬 Communication (8082)"]
+                    end
+
+                    subgraph "Data Layer"
+                    AuthDB[("🗄️ MySQL: carecircle_auth")]
+                    ProfileDB[("🗄️ MySQL: carecircle_profile")]
+                    BookingDB[("🗄️ MySQL: carecircle_booking")]
+                    ChatDB[("🗄️ MySQL: carecircle_comm")]
+                    end
+
+                    ReactApp --> Gateway
+                    Gateway <--> Redis
+                        Auth <--> Redis
+                            Gateway --> Auth
+                            Gateway --> Profile
+                            Gateway --> Booking
+                            Gateway --> Chat
+
+                            Auth --> AuthDB
+                            Profile --> ProfileDB
+                            Booking --> BookingDB
+                            Chat --> ChatDB
+                </div>
+            </div>
+        </div>
+
+        <!-- Master API Map Section -->
+        <div id="api-map" class="section">
+            <h1>🗺️ Total Controller & Request Map</h1>
+            <p>Comprehensive technical overview of every controller, who triggers it, and its core action.</p>
+
+            <div class="card">
+                <h3>🔑 Auth Service (Identity Layer)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Controller</th>
+                            <th>Who Calls?</th>
+                            <th>Request / Path</th>
+                            <th>Core Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>AuthController</code></td>
+                            <td><span class="badge badge-all">All Users</span></td>
+                            <td><code>POST /auth/**</code></td>
+                            <td>Login, Registration, OTP verification, and JWT issuance.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>👤 User Profile Service (User Metadata)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Controller</th>
+                            <th>Who Calls?</th>
+                            <th>Request / Path</th>
+                            <th>Core Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>ParentProfileController</code></td>
+                            <td><span class="badge badge-parent">Parent</span></td>
+                            <td><code>POST/GET /parents/profile</code></td>
+                            <td>Creation and management of parent bio and address.</td>
+                        </tr>
+                        <tr>
+                            <td><code>CaregiverController</code></td>
+                            <td><span class="badge badge-caregiver">Caregiver</span></td>
+                            <td><code>POST/PUT /caregiver/**</code></td>
+                            <td>Management of skills, experience, and bio.</td>
+                        </tr>
+                        <tr>
+                            <td><code>ChildController</code></td>
+                            <td><span class="badge badge-parent">Parent</span></td>
+                            <td><code>POST/GET /children/**</code></td>
+                            <td>Managing child profiles linked to parent account.</td>
+                        </tr>
+                        <tr>
+                            <td><code>AdminController</code></td>
+                            <td><span class="badge badge-admin">Admin</span></td>
+                            <td><code>GET/PUT /admin/**</code></td>
+                            <td>Moderation and profile approval workflows.</td>
+                        </tr>
+                        <tr>
+                            <td><code>CommonLookupController</code></td>
+                            <td><span class="badge badge-all">All</span></td>
+                            <td><code>GET /common/**</code></td>
+                            <td>Fetching static lookup data (Genders, Types).</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>📅 Matching & Booking Service (Business Logic)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Controller</th>
+                            <th>Who Calls?</th>
+                            <th>Request / Path</th>
+                            <th>Core Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>MatchingController</code></td>
+                            <td><span class="badge badge-parent">Parent</span></td>
+                            <td><code>POST /search</code></td>
+                            <td>Elite Search Engine: Finding caregivers by city & time.</td>
+                        </tr>
+                        <tr>
+                            <td><code>BookingController</code></td>
+                            <td><span class="badge badge-parent">Parent</span></td>
+                            <td><code>POST /bookings</code></td>
+                            <td>Creation of a booking with Overlap Check validation.</td>
+                        </tr>
+                        <tr>
+                            <td><code>StatusController</code></td>
+                            <td><span class="badge badge-caregiver">Caregiver</span></td>
+                            <td><code>PUT /bookings/{id}/status</code></td>
+                            <td>Lifecycle: Moving booking from REQUESTED to ACCEPTED.</td>
+                        </tr>
+                        <tr>
+                            <td><code>AvailabilityController</code></td>
+                            <td><span class="badge badge-caregiver">Caregiver</span></td>
+                            <td><code>POST /availability</code></td>
+                            <td>Setting the 'Ready to Work' time slots.</td>
+                        </tr>
+                        <tr>
+                            <td><code>RateController</code></td>
+                            <td><span class="badge badge-parent">Parent</span></td>
+                            <td><code>POST /bookings/rate</code></td>
+                            <td>Review system: Updating caregiver's cumulative rating.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>💬 Communication Service (Messaging)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Controller</th>
+                            <th>Who Calls?</th>
+                            <th>Request / Path</th>
+                            <th>Core Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>ChatController</code></td>
+                            <td><span class="badge badge-all">All</span></td>
+                            <td><code>POST /chats/rooms</code></td>
+                            <td>Initializing "Safe Space" chat tied to a valid booking.</td>
+                        </tr>
+                        <tr>
+                            <td><code>WebSocketController</code></td>
+                            <td><span class="badge badge-all">System</span></td>
+                            <td><code>PUB /topic/chat/{id}</code></td>
+                            <td>Real-time STOMP broadcasting of messages.</td>
+                        </tr>
+                        <tr>
+                            <td><code>BlockController</code></td>
+                            <td><span class="badge badge-all">All</span></td>
+                            <td><code>POST /blocks</code></td>
+                            <td>Safety mechanism to prevent communication with a user.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="note">
+                <strong>Technical Pattern</strong>: All requests are authenticated at the Gateway (8080) and arrive at
+                controllers with pre-validated <code>X-User-Id</code> and <code>X-User-Role</code> headers.
+            </div>
+        </div>
+
+        <!-- Request Lifecycle Section -->
+        <div id="request" class="section">
+            <h1>🌉 Request Lifecycle (Elite Sequence)</h1>
+            <p>This shows exactly "Who asks," "What is validated," and "What returns."</p>
+            <div class="card">
+                <div class="mermaid">
+                    sequenceDiagram
+                    participant U as 📱 React UI
+                    participant G as 🛡️ Gateway (Filter)
+                    participant R as 🚀 Redis
+                    participant MS as 🏛️ Microservice
+                    participant DB as 🗄️ MySQL
+
+                    U->>G: 1. Request(Bearer Token)
+                    Note over G: Invoke Global Filter
+                    G->>R: 2. Check Blacklist (isTokenExpunged?)
+                    R-->>G: No (Clear)
+                    Note over G: Validate JWT & Extract Claims
+                    Note over G: Mutate Request: Add X-User-Id
+                    G->>MS: 3. Forward Trusted Request
+                    MS->>DB: 4. Domain Logic (SQL Query)
+                    DB-->>MS: Data
+                    MS-->>G: 5. Response Object
+                    G-->>U: 6. 200 OK (JSON)
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Creation Flow Section -->
+        <div id="profile" class="section">
+            <h1>👤 Profile Creation Flow</h1>
+            <div class="card">
+                <div class="mermaid">
+                    sequenceDiagram
+                    participant U as 👤 User (UI)
+                    participant G as 🛡️ Gateway
+                    participant P as 👤 Profile Service
+                    participant M as 🛡️ Matching Service
+                    participant PDB as 🗄️ MySQL (Profile_DB)
+
+                    U->>G: 1. POST /parents/profile
+                    G->>P: 2. Inject X-User-Id & Forward
+                    Note over P: Start Transaction
+                    P->>M: 3. REST CALL: Verify City Metadata
+                    M-->>P: 4. OK (City Valid)
+                    P->>PDB: 5. INSERT into parent_profile
+                    Note over PDB: Linked to UI's X-User-Id
+                    PDB-->>P: Success
+                    P-->>U: 6. 201 Created
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat & Booking Bridge Section -->
+        <div id="chat" class="section">
+            <h1>💬 The Chat & Booking Bridge Pattern</h1>
+            <div class="card">
+                <div class="mermaid">
+                    sequenceDiagram
+                    participant U as 👤 User (Initiator)
+                    participant C as 💬 Chat Service
+                    participant B as 📅 Booking Service
+                    participant CDB as 🗄️ MySQL (Chat_DB)
+                    participant WS as 🌊 WebSocket
+
+                    U->>C: 1. POST /chats/rooms (bookingId)
+                    Note over C: ChatServiceImpl.initializeChatRoom()
+                    C->>B: 2. REST: Fetch Booking Details
+                    B-->>C: 3. Return Status (e.g. ACCEPTED/CONFIRMED)
+
+                    alt Is Booking Confirmed?
+                    C->>C: 4. Check If Room Exists
+                    opt New Room Required
+                    C->>CDB: 5. CREATE ChatRoom(bookingId)
+                    C->>CDB: 6. AUTO-ADD Participants (Parent & Caregiver)
+                    end
+                    C-->>U: 7. Return roomId (Success)
+                    else Booking Status Denied
+                    C-->>U: 8. Throw 403 Forbidden (Chat Unavailable)
+                    end
+
+                    Note over U,WS: Message Flow
+                    U->>C: 9. Send Message (roomId)
+                    C->>C: 10. Check BlockService (Is Participant Blocked?)
+                    C->>CDB: 11. PERSIST Message (SQL)
+                    C->>WS: 12. BROADCAST (STOMP Topic)
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Flow Section -->
+        <div id="booking" class="section">
+            <h1>📅 Matching & Booking Flow</h1>
+            <div class="card">
+                <div class="mermaid">
+                    sequenceDiagram
+                    participant P as 👤 Parent (UI)
+                    participant M as 🛡️ Matching Service
+                    participant B as 📅 Booking Service
+                    participant DB as 🗄️ MySQL (Booking_DB)
+
+                    P->>M: 1. GET /search (City, Date)
+                    M->>DB: 2. Query Availability
+                    DB-->>M: Slots Found
+                    M-->>P: 3. Return Caregivers
+
+                    P->>B: 4. POST /bookings (Request Slot)
+                    Note over B: Overlap Check Pattern
+                    B->>DB: 5. checkOverlap(parentId, time)
+                    DB-->>B: No Conflict
+                    B->>DB: 6. INSERT into bookings (Status: REQUESTED)
+                    B-->>P: 7. 201 Created (Booking Locked)
+
+                    Note over B,DB: Caregiver Action
+                    B->>DB: 8. UPDATE status to ACCEPTED
+                    DB-->>B: Success
+                    B-->>P: 9. Notification: Chat Room Open!
+                </div>
+            </div>
+        </div>
+
+        <!-- Redis Session Flow -->
+        <div id="redis" class="section">
+            <h1>🚀 Redis Session Flow</h1>
+            <div class="card">
+                <div class="mermaid">
+                    sequenceDiagram
+                    participant C as Client
+                    participant G as Gateway
+                    participant A as Auth
+                    participant R as Redis
+
+                    C->>A: Login
+                    A->>R: Store uuid:refresh_token
+                    A-->>C: Access + Refresh Tokens
+
+                    C->>G: API request (Access)
+                    G->>R: check blacklist:token
+                    R-->>G: Clear
+                    G-->>C: Data returned
+                </div>
+            </div>
+        </div>
+
+        <!-- SOLID Principles -->
+        <div id="solid" class="section">
+            <h1>💎 SOLID Summary</h1>
+            <div class="card">
+                <div class="note"><strong>S</strong>: One service per domain.</div>
+                <div class="note"><strong>O</strong>: Repository abstractions.</div>
+                <div class="note"><strong>L</strong>: Type safety in DTOs.</div>
+                <div class="note"><strong>I</strong>: Role-specific controllers.</div>
+                <div class="note"><strong>D</strong>: Dependency Injection via Constructors.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('#sidebar a').forEach(a => a.classList.remove('active'));
+
+            document.getElementById(id).classList.add('active');
+            document.getElementById('link-' + id).classList.add('active');
+
+            mermaid.contentLoaded();
+        }
+    </script>
+
+</body>
+
+</html>
