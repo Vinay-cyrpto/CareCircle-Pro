@@ -1,18 +1,33 @@
-# React + Vite
+# 💻 CareCircle-Pro Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The Modern, Responsive User Interface of CareCircle-Pro. Built with React and Vite, this application provides a seamless experience for parents and caregivers to manage bookings and communicate in real-time.
 
-Currently, two official plugins are available:
+## 🛠️ Tech Stack
+- **Framework**: React 18+ (Vite)
+- **Styling**: Vanilla CSS (High-Performance)
+- **State Management**: React Context API & Hooks
+- **Real-time**: SockJS & STOMP Client (WebSockets)
+- **API Client**: Axios with Interceptors
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🎯 Key Features
+1.  **JWT-First Auth Flow**: Includes a dedicated Axios interceptor that automatically injects the `Bearer` token into outgoing requests and handles `401 Unauthorized` responses with silent refresh logic.
+2.  **Dual-Role Dashboard**: Dynamic UI rendering based on whether the logged-in user is a **Parent** (Search/Book focus) or a **Caregiver** (Manage/Accept focus).
+3.  **Real-time Chat UI**: A high-fidelity messaging interface that subscribes to STOMP topics and reflects new messages instantly without page refreshes.
+4.  **Component Architecture**: Reusable UI components (Buttons, Input, Cards) ensuring a consistent, premium look and feel across the platform.
 
-## React Compiler
+## 📂 Project Structure
+- `/src/components`: Reusable UI atom components.
+- `/src/pages`: Feature-specific views (Login, Profile, Matching, Chat).
+- `/src/context`: Global authentication and notification states.
+- `/src/services`: API abstraction layers using Axios.
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+## 🚀 Development Setup
+Navigate to this folder and run:
+```bash
+npm install
+npm run dev
+```
+- **Port**: `5173`
 
-Note: This will impact Vite dev & build performances.
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+*Designing a caregiver ecosystem that is as reliable as it is beautiful.*
