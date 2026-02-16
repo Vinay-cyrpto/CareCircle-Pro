@@ -1,29 +1,29 @@
-# User Profile Service
+# 👤 User Profile Service
 
-## Purpose
-Manages domain-level user profiles for CareCircle Pro.
+The Persona & Metadata Management layer of CareCircle-Pro. This service manages the detailed information for Parent and Caregiver entities, ensuring data integrity through cross-service validation.
 
-Supports:
-- Parent profiles
-- Provider (nanny/caregiver) profiles
-- Admin profiles
+## 🛠️ Tech Stack
+- **Framework**: Spring Boot 3.x
+- **Database**: MySQL (`carecircle_profile`)
+- **Integration**: Feign/RestTemplate for inter-service calls.
 
-## Responsibilities
-- Store extended user profile data
-- Manage children and care requirements
-- Handle verification status and skills
+## 🎯 Key Features
+1.  **Multi-Role Personas**: Specialized storage for Parents (children, addresses) and Caregivers (skills, experience, ratings).
+2.  **Validation Bridge**: During profile creation, this service makes a synchronous REST call to the **Matching Service** to verify city/region data before committing to the database.
+3.  **UUID Linking**: Profiles are linked to the Auth system via the `userId` UUID, ensuring strict separation of Identity and Persona.
+4.  **Admin Moderation**: APIs for approving caregiver profiles and managing system-wide metadata.
 
-## What this service does NOT do
-- Authentication
-- Authorization
-- JWT validation
+## 🔌 API Summary
+| Path | Method | Description |
+| :--- | :--- | :--- |
+| `/parents/profile` | `POST` | Creating a parent profile (validated against city data). |
+| `/caregiver/profile` | `POST` | Onboarding a new caregiver. |
+| `/children` | `POST/GET` | Managing child profiles for parents. |
+| `/admin/profiles` | `PUT` | Moderating and approving user profiles. |
 
-## Security Model
-This service trusts headers injected by the API Gateway:
-- X-User-Email
-- X-User-Role
+## 🚀 Port & Configuration
+- **Port**: `8083`
+- **Internal Host**: `user-profile-service`
 
-## Tech Stack
-- Java 21
-- Spring Boot 3.x
-- Spring Data JPA
+---
+*Ensuring every persona in the CareCircle ecosystem is verified and detailed.*
