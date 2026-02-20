@@ -43,9 +43,9 @@ graph TD
 ### 2. Environment Configuration
 The application uses environment variables for secure configuration.
 
-1. Copy the `.env.example` file to create your own `.env` file:
+1. Copy the `env.example` file to create your own `.env` file:
    ```bash
-   cp .env.example .env
+   cp env.example .env
    ```
 2. Open `.env` and fill in your actual credentials (database passwords, mail server secrets, JWT keys).
 
@@ -77,9 +77,8 @@ mvn spring-boot:run  # For Java services
 npm run dev         # For the Frontend
 ```
 
-## 📚 Elite Study Manuals
+## 📚 Project Documentation
 - **[Master Visual Guide](./master_visual_guide.html)**: Interactive diagrams and feature flows.
-- **[Comprehensive Interview Guide](./comprehensive_project_guide.md)**: 150+ Technical Q&As.
 
 ---
 *Built with professional integrity by CareCircle-Pro Team.*
