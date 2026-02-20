@@ -1,16 +1,6 @@
-import API_BASE_URL from "./api";
-
-const getHeaders = () => {
-    const token = localStorage.getItem("token");
-    return {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-    };
-};
+import api from "./api";
 
 export const searchCaregivers = async (city = "", serviceId = "", date = "", startTime = "", endTime = "", childAge = "", page = 0, limit = 10) => {
-
-    // Construct request body
     const body = {
         city: city || null,
         serviceId: serviceId || null,
@@ -22,31 +12,36 @@ export const searchCaregivers = async (city = "", serviceId = "", date = "", sta
         limit
     };
 
-    const res = await fetch(`${API_BASE_URL}/matching/search`, {
-        method: "POST",
-        headers: getHeaders(),
-        body: JSON.stringify(body)
-    });
-
-    if (!res.ok) throw new Error("Failed to search caregivers");
-    return res.json();
+    const res = await api.post("/matching/search", body);
+    return res.data;
 };
 
 export const getActiveServices = async () => {
-    const res = await fetch(`${API_BASE_URL}/services`, {
-        method: "GET",
-        headers: getHeaders(),
-    });
-    if (!res.ok) throw new Error("Failed to fetch services");
-    return res.json();
+    const res = await api.get("/services");
+    return res.data;
+};
+
+export const getServices = async () => {
+    const res = await api.get("/services");
+    return res.data;
 };
 
 export const createBooking = async (bookingData) => {
-    const res = await fetch(`${API_BASE_URL}/bookings`, {
-        method: "POST",
-        headers: getHeaders(),
-        body: JSON.stringify(bookingData),
-    });
-    if (!res.ok) throw new Error("Failed to create booking");
-    return res.json();
+    const res = await api.post("/bookings", bookingData);
+    return res.data;
+};
+
+export const getCaregiversInCity = async (cityCode) => {
+    const res = await api.get(`/matching/caregivers?cityCode=${cityCode}`);
+    return res.data;
+};
+
+export const findCaregivers = async (criteria) => {
+    const res = await api.post("/matching/find", criteria);
+    return res.data;
+};
+
+export const getCaregiverDetailsMatch = async (caregiverId) => {
+    const res = await api.get(`/matching/caregivers/${caregiverId}`);
+    return res.data;
 };

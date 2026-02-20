@@ -1,46 +1,32 @@
-import API_BASE_URL from "./api";
+import api from "./api";
 
-const getHeaders = () => {
-    const token = localStorage.getItem("token");
-    return {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-    };
-};
-
-export const createBooking = async (bookingData) => {
-    const res = await fetch(`${API_BASE_URL}/bookings`, {
-        method: "POST",
-        headers: getHeaders(),
-        body: JSON.stringify(bookingData),
-    });
-    if (!res.ok) {
-        const err = await res.text();
-        throw new Error(err || "Failed to create booking");
-    }
-    return res.json();
+export const createBooking = async (data) => {
+    const res = await api.post("/bookings", data);
+    return res.data;
 };
 
 export const getBookings = async (caregiverId = null, parentId = null, status = null) => {
-    let url = `${API_BASE_URL}/bookings?`;
+    let url = "/bookings?";
     if (caregiverId) url += `caregiverId=${caregiverId}&`;
     if (parentId) url += `parentId=${parentId}&`;
     if (status) url += `status=${status}&`;
-
-    const res = await fetch(url, {
-        method: "GET",
-        headers: getHeaders()
-    });
-    if (!res.ok) throw new Error("Failed to fetch bookings");
-    return res.json();
+    const res = await api.get(url.slice(0, -1));
+    return res.data;
 };
 
-export const updateBookingStatus = async (bookingId, status) => {
-    const res = await fetch(`${API_BASE_URL}/bookings/${bookingId}/status`, {
-        method: "PUT",
-        headers: getHeaders(),
-        body: JSON.stringify({ status })
-    });
-    if (!res.ok) throw new Error("Failed to update booking status");
-    return res.json();
+export const getBookingsForUser = getBookings;
+
+export const getBookingDetails = async (id) => {
+    const res = await api.get(`/bookings/${id}`);
+    return res.data;
+};
+
+export const updateBookingStatus = async (id, status) => {
+    const res = await api.put(`/bookings/${id}/status`, { status });
+    return res.data;
+};
+
+export const confirmBookingCompletion = async (id, rating, review) => {
+    const res = await api.post(`/bookings/${id}/complete`, { rating, review });
+    return res.data;
 };

@@ -4,7 +4,7 @@ CareCircle-Pro is a high-fidelity, real-time ecosystem connecting parents with s
 
 ## 🏗️ System Architecture
 
-The system follows a **Domain-Driven Design (DDD)** split across four core microservices, orchestrated by a secure API Gateway and backed by Redis for high-performance session management.
+The system follows a **Domain-Driven Design (DDD)** split across core microservices, orchestrated by a secure API Gateway and backed by Redis for high-performance session management.
 
 ```mermaid
 graph TD
@@ -32,26 +32,32 @@ graph TD
     Gateway --> Chat
 ```
 
-## 🚀 Quick Start (Local Development)
+## 🚀 Getting Started
 
 ### 1. Prerequisites
-- Java 17+
-- Node.js 18+
-- MySQL 8.x
-- Redis 7.x
+- [Docker & Docker Compose](https://www.docker.com/get-started)
+- [Java 17+](https://adoptium.net/)
+- [Node.js 18+](https://nodejs.org/)
+- [Maven](https://maven.apache.org/)
 
-### 2. Launch Infrastructure
-Navigate to the root and run:
-```bash
-docker-compose up -d
-```
-*This starts MySQL and Redis containers required for all services.*
+### 2. Environment Configuration
+The application uses environment variables for secure configuration.
 
-### 3. Start Microservices
-Run each service in its respective folder:
+1. Copy the `.env.example` file to create your own `.env` file:
+   ```bash
+   cp .env.example .env
+   ```
+2. Open `.env` and fill in your actual credentials (database passwords, mail server secrets, JWT keys).
+
+> [!IMPORTANT]
+> Never commit your `.env` file to version control. It is already included in `.gitignore`.
+
+### 3. Launch with Docker
+The easiest way to run the entire stack is using Docker Compose:
 ```bash
-mvn spring-boot:run
+docker-compose up --build
 ```
+This starts MySQL, Redis, all Microservices, and the Frontend.
 
 ## 🗺️ Port Map & Entry Points
 
@@ -63,6 +69,13 @@ mvn spring-boot:run
 | **Profile Service**| `8083` | `carecircle_profile`| Parent/Caregiver Metadata |
 | **Booking Service**| `8085` | `carecircle_booking`| Matching, Overlap Checks |
 | **Frontend UI** | `5173` | N/A | React (Vite) User Interface |
+
+## 🛠️ Development
+If you want to run services individually, navigate to the specific service directory and use:
+```bash
+mvn spring-boot:run  # For Java services
+npm run dev         # For the Frontend
+```
 
 ## 📚 Elite Study Manuals
 - **[Master Visual Guide](./master_visual_guide.html)**: Interactive diagrams and feature flows.

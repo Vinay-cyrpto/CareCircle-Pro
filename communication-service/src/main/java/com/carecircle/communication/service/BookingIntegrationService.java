@@ -14,7 +14,7 @@ import java.util.Map;
 public class BookingIntegrationService {
 
     private final RestClient restClient;
-    private static final String BOOKING_SERVICE_URL = "http://localhost:8085";
+    private static final String BOOKING_SERVICE_URL = "http://matching-booking-service:8085";
 
     public BookingIntegrationService(RestClient.Builder restClientBuilder) {
         this.restClient = restClientBuilder.baseUrl(BOOKING_SERVICE_URL).build();

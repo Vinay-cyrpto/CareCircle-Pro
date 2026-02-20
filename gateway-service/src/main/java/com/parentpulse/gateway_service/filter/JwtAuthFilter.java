@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import com.parentpulse.gateway_service.security.BlacklistService;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ import java.util.List;
 public class JwtAuthFilter implements GlobalFilter {
 
     private final JwtUtil jwtUtil;
+    private final BlacklistService blacklistService;
 
     // Gateway-level service prefixes (ADD MORE HERE LATER)
     private static final List<String> SERVICE_PREFIXES = List.of(
@@ -24,8 +26,9 @@ public class JwtAuthFilter implements GlobalFilter {
             "/auth-service",
             "/communication-service");
 
-    public JwtAuthFilter(JwtUtil jwtUtil) {
+    public JwtAuthFilter(JwtUtil jwtUtil, BlacklistService  blacklistService) {
         this.jwtUtil = jwtUtil;
+        this.blacklistService = blacklistService;
     }
 
     @Override
@@ -54,41 +57,50 @@ public class JwtAuthFilter implements GlobalFilter {
 
         String token = authHeader.substring(7);
 
-        Claims claims;
-        try {
-            claims = jwtUtil.validateAndExtractClaims(token);
-        } catch (Exception e) {
-            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-            return exchange.getResponse().setComplete();
-        }
+        // Check Blacklist FIRST
+        return blacklistService.isTokenBlacklisted(token)
+                .flatMap(isBlacklisted -> {
+                    if (isBlacklisted) {
+                        exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                        return exchange.getResponse().setComplete();
+                    }
 
-        String role = claims.get("role", String.class);
-        String userId = claims.get("userId", String.class);
+                    Claims claims;
+                    try {
+                        claims = jwtUtil.validateAndExtractClaims(token);
+                    } catch (Exception e) {
+                        exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                        return exchange.getResponse().setComplete();
+                    }
 
-        // ===== NORMALIZE PATH (CRITICAL FIX) =====
-        String normalizedPath = normalizePath(path);
+                    String role = claims.get("role", String.class);
+                    String userId = claims.get("userId", String.class);
 
-        // ===== ROLE-BASED AUTHORIZATION =====
-        if (!isAuthorized(normalizedPath, role)) {
-            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-            return exchange.getResponse().setComplete();
-        }
+                    // ===== NORMALIZE PATH (CRITICAL FIX) =====
+                    String normalizedPath = normalizePath(path);
 
-        // ===== FORWARD TRUSTED HEADERS =====
-        exchange = exchange.mutate()
-                .request(builder -> builder
-                        .headers(headers -> {
-                            headers.remove("X-User-Email");
-                            headers.remove("X-User-Role");
-                            headers.remove("X-Request-Source");
-                        })
-                        .header("X-User-Email", claims.getSubject())
-                        .header("X-User-Role", role)
-                        .header("X-User-Id", userId)
-                        .header("X-Request-Source", "GATEWAY"))
-                .build();
+                    // ===== ROLE-BASED AUTHORIZATION =====
+                    if (!isAuthorized(normalizedPath, role)) {
+                        exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+                        return exchange.getResponse().setComplete();
+                    }
 
-        return chain.filter(exchange);
+                    // ===== FORWARD TRUSTED HEADERS =====
+                    ServerWebExchange mutatedExchange = exchange.mutate()
+                            .request(builder -> builder
+                                    .headers(headers -> {
+                                        headers.remove("X-User-Email");
+                                        headers.remove("X-User-Role");
+                                        headers.remove("X-Request-Source");
+                                    })
+                                    .header("X-User-Email", claims.getSubject())
+                                    .header("X-User-Role", role)
+                                    .header("X-User-Id", userId)
+                                    .header("X-Request-Source", "GATEWAY"))
+                            .build();
+
+                    return chain.filter(mutatedExchange);
+                });
     }
 
     // ===== PATH NORMALIZATION =====

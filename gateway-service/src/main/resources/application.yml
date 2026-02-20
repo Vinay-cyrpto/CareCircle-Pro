@@ -7,13 +7,25 @@ spring:
 
   cloud:
     gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:5173" # Vite default
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
       routes:
 
         # =========================
         # AUTH SERVICE
         # =========================
         - id: auth-service
-          uri: http://localhost:8081
+          uri: http://auth-service:8081
           predicates:
             - Path=/auth/**
           # No StripPrefix needed for /auth/** as controller expects /auth/...
@@ -22,19 +34,19 @@ spring:
         # MATCHING SERVICE
         # =========================
         - id: matching-service-cities
-          uri: http://localhost:8085
+          uri: http://matching-booking-service:8085
           predicates:
             - Path=/cities/**, /services/**
           # Controller expects /cities... or /services...
 
         - id: matching-service-admin
-          uri: http://localhost:8085
+          uri: http://matching-booking-service:8085
           predicates:
             - Path=/admin/cities/**, /admin/matching/**, /admin/services/**
           # Controller expects /admin/cities, /admin/matching, /admin/services...
 
         - id: matching-service-legacy
-          uri: http://localhost:8085
+          uri: http://matching-booking-service:8085
           predicates:
             - Path=/matching-booking-service/**
           filters:
@@ -42,7 +54,7 @@ spring:
 
         # Generic Matching API
         - id: matching-service-api
-          uri: http://localhost:8085
+          uri: http://matching-booking-service:8085
           predicates:
             - Path=/matching/**
 
@@ -50,41 +62,41 @@ spring:
         # USER PROFILE SERVICE
         # =========================
         - id: user-profile-parents
-          uri: http://localhost:8083
+          uri: http://user-profile-service:8083
           predicates:
             - Path=/parents/**
 
         # Specific Caregiver routes for Matching/Booking
         - id: matching-service-caregiver-ops
-          uri: http://localhost:8085
+          uri: http://matching-booking-service:8085
           predicates:
             - Path=/caregiver/services/**, /caregiver/services, /caregiver/certifications/**, /caregiver/certifications, /caregiver/availability/**, /caregiver/availability, /caregiver/rating/**, /caregiver/rating
 
         - id: matching-service-bookings
-          uri: http://localhost:8085
+          uri: http://matching-booking-service:8085
           predicates:
             - Path=/bookings/**
 
         - id: user-profile-caregiver
-          uri: http://localhost:8083
+          uri: http://user-profile-service:8083
           predicates:
             - Path=/caregiver/**
           # Controller expects /caregiver...
           
         - id: user-profile-children
-          uri: http://localhost:8083
+          uri: http://user-profile-service:8083
           predicates:
              - Path=/children/**
 
         - id: user-profile-admin
-          uri: http://localhost:8083
+          uri: http://user-profile-service:8083
           predicates:
             - Path=/admin/**
           # Catch-all for other admin routes (User Profile service)
           # Note: Specific admin routes (cities, matching) must be defined ABOVe this to take precedence
 
         - id: user-profile-service-legacy
-          uri: http://localhost:8083
+          uri: http://user-profile-service:8083
           predicates:
             - Path=/user-profile-service/**
           filters:
@@ -94,22 +106,27 @@ spring:
         # COMMUNICATION SERVICE
         # =========================
         - id: communication-service
-          uri: http://localhost:8082
+          uri: http://communication-service:8082
           predicates:
             - Path=/communication-service/**
           filters:
             - StripPrefix=1
 
         - id: communication-ws
-          uri: http://localhost:8082
+          uri: http://communication-service:8082
           predicates:
             - Path=/ws/**
           filters:
             - DedupeResponseHeader=Access-Control-Allow-Origin, RETAIN_FIRST
             - DedupeResponseHeader=Access-Control-Allow-Credentials, RETAIN_FIRST
 
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
 jwt:
-  secret: carecircle-auth-secret-key-which-is-at-least-32-bytes-long
+  secret: ${JWT_SECRET:carecircle-auth-secret-key-which-is-at-least-32-bytes-long}
 
 management:
   endpoints:

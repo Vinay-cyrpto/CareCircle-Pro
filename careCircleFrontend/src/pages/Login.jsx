@@ -45,14 +45,17 @@ export default function Login() {
 
     try {
       const data = await login(email, password, role);
-      const token = data.accessToken;
-      if (!token) throw new Error("Token not received.");
+      const { accessToken, refreshToken } = data;
+      if (!accessToken) throw new Error("Access token not received.");
 
-      const decoded = jwtDecode(token);
-      localStorage.setItem("token", token);
+      const decoded = jwtDecode(accessToken);
+      localStorage.setItem("token", accessToken);
+      localStorage.setItem("refreshToken", refreshToken); // Store Refresh Token
+
       const tokenRole = decoded.role || role;
       localStorage.setItem("role", tokenRole);
       localStorage.setItem("userEmail", decoded.sub || email);
+      localStorage.setItem("userId", decoded.userId); // Store UserId for various lookups
 
       if (tokenRole === "ROLE_PARENT") {
         try {

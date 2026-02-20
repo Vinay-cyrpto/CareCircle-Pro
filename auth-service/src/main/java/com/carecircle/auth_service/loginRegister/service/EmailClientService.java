@@ -17,7 +17,7 @@ public class EmailClientService {
 
         try {
             restTemplate.postForObject(
-                    "http://localhost:8082/api/email/welcome",
+                    "http://communication-service:8082/api/email/welcome",
                     request,
                     String.class
             );

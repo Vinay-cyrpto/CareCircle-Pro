@@ -1,0 +1,146 @@
+version: "3.9"
+
+services:
+
+  # MySQL Database Instance
+  mysql:
+    image: mysql:8.0
+    container_name: carecircle-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3106:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./mysql/init.sh:/docker-entrypoint-initdb.d/init.sh
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u$$MYSQL_USER", "-p$$MYSQL_PASSWORD"]
+      timeout: 20s
+      retries: 10
+      interval: 10s
+    networks:
+      - carecircle-network
+
+  # Redis for Session Management & Token Blacklisting
+  redis:
+    image: redis:alpine
+    container_name: carecircle-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - carecircle-network
+    restart: always
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    ports:
+      - "8081:8081"
+    environment:
+      DB_HOST: mysql
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: redis
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+    depends_on:
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    networks:
+      - carecircle-network
+
+  user-profile-service:
+    build: ./user-profile-service
+    container_name: user-profile-service
+    ports:
+      - "8083:8083"
+    environment:
+      DB_HOST: mysql
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: redis
+    depends_on:
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    networks:
+      - carecircle-network
+
+  communication-service:
+    build: ./communication-service
+    container_name: communication-service
+    ports:
+      - "8082:8082"
+    environment:
+      DB_HOST: mysql
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: redis
+    depends_on:
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    networks:
+      - carecircle-network
+
+  matching-booking-service:
+    build: ./matching-booking-service
+    container_name: matching-booking-service
+    ports:
+      - "8085:8085"
+    environment:
+      DB_HOST: mysql
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: redis
+    depends_on:
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    networks:
+      - carecircle-network
+
+  gateway-service:
+    build: ./gateway-service
+    container_name: gateway-service
+    ports:
+      - "8080:8080"
+    environment:
+      REDIS_HOST: redis
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - carecircle-network
+
+  frontend:
+    build: ./careCircleFrontend
+    container_name: carecircle-frontend
+    ports:
+      - "5173:80"
+    networks:
+      - carecircle-network
+
+networks:
+  carecircle-network:
+    driver: bridge
+
+volumes:
+  mysql-data:

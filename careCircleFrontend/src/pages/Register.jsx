@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { isValidPassword } from "../utils/passwordValidation";
 import PasswordInput from "../components/PasswordInput";
+import { register } from "../api/authApi";
 import logo from "../assets/logo.png";
 
 export default function Register() {
@@ -54,36 +55,7 @@ export default function Register() {
 
     try {
       setLoading(true);
-      const response = await fetch("/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          role: form.role,
-          email: form.email,
-          password: form.password
-        })
-      });
-
-      if (!response.ok) {
-        const text = await response.text();
-        let errorMsg = text || "Registration failed";
-        try {
-          const data = JSON.parse(text);
-          errorMsg = data.message || data.error || text || "Registration failed";
-        } catch (e) { }
-
-        // Check for existing email keywords or 409 status ONLY on failure
-        const isExistingEmail = response.status === 409 ||
-          /exist|already|taken|conflict/i.test(errorMsg);
-
-        if (isExistingEmail) {
-          setError("Email already exists. Please login.");
-          setTimeout(() => navigate("/login", { state: { role: form.role } }), 2000);
-          return;
-        }
-
-        throw new Error(errorMsg);
-      }
+      await register(form.email, form.password, form.role);
 
       setSuccess(true);
       setTimeout(() => {

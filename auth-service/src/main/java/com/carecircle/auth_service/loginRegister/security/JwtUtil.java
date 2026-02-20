@@ -57,4 +57,12 @@ public class JwtUtil {
                 .signWith(signingKey, SignatureAlgorithm.HS256)
                 .compact();
     }
+
+    public io.jsonwebtoken.Claims extractAllClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(signingKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
 }
